@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "u+wgQh8jGJd2C4JlGqoakjHop2iBa8eOL/l3e9sEV58Uu4I9MIKmgK8ySbaH2FkcUp4WNc5QdakOF4j+Gb4KBg==",
+  "success": true,
+  "projectFilePath": "C:\\D\\程式設計與應用\\FeildBalancing\\FeildBalancing\\FeildBalancing.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\KirdenKe\\.nuget\\packages\\microsoft.windows.sdk.net.ref\\10.0.19041.28\\microsoft.windows.sdk.net.ref.10.0.19041.28.nupkg.sha512"
+  ],
+  "logs": []
+}
