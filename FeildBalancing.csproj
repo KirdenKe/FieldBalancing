@@ -14,6 +14,7 @@
 	<Product>物聯網終端機</Product>
 	<Description>物聯網終端機</Description>
 	<Copyright>Copyright © 2023 NCU KirdenKe</Copyright>
+	<PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

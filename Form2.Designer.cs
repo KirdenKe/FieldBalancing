@@ -90,7 +90,7 @@
             Controls.Add(label1);
             Font = new Font("微軟正黑體", 9F, FontStyle.Bold, GraphicsUnit.Point);
             Name = "Form2";
-            Text = "Form2";
+            Text = "請先登入";
             ResumeLayout(false);
             PerformLayout();
         }

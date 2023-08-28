@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FeildBalancing
 {
@@ -65,6 +61,10 @@ namespace FeildBalancing
         {
             _UserName = userName;
             _UserPassword = userPassword;
+        }
+        public Log(string DeviceID) 
+        {
+            _DeviceID = DeviceID;
         }
     }
     public static class Extension

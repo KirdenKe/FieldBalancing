@@ -52,8 +52,8 @@ namespace FeildBalancing
             button_RemoveStaff = new Button();
             button_NewStaff = new Button();
             tabPage_QueryLogFile = new TabPage();
-            button_SelectFile = new Button();
             textBox_LogFile = new TextBox();
+            button_SelectFile = new Button();
             tabControl.SuspendLayout();
             tabPage_FactoryStatus.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox_FeildBalancingNo3).BeginInit();
@@ -246,6 +246,15 @@ namespace FeildBalancing
             tabPage_QueryLogFile.TabIndex = 2;
             tabPage_QueryLogFile.Text = "記錄檔查詢";
             // 
+            // textBox_LogFile
+            // 
+            textBox_LogFile.Location = new Point(103, 3);
+            textBox_LogFile.Multiline = true;
+            textBox_LogFile.Name = "textBox_LogFile";
+            textBox_LogFile.ScrollBars = ScrollBars.Both;
+            textBox_LogFile.Size = new Size(665, 388);
+            textBox_LogFile.TabIndex = 1;
+            // 
             // button_SelectFile
             // 
             button_SelectFile.Location = new Point(3, 3);
@@ -256,15 +265,6 @@ namespace FeildBalancing
             button_SelectFile.UseVisualStyleBackColor = true;
             button_SelectFile.Click += button_SelectFile_Click;
             // 
-            // textBox_LogFile
-            // 
-            textBox_LogFile.Location = new Point(103, 3);
-            textBox_LogFile.Multiline = true;
-            textBox_LogFile.Name = "textBox_LogFile";
-            textBox_LogFile.ScrollBars = ScrollBars.Both;
-            textBox_LogFile.Size = new Size(665, 388);
-            textBox_LogFile.TabIndex = 1;
-            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
@@ -273,7 +273,7 @@ namespace FeildBalancing
             Controls.Add(tabControl);
             Font = new Font("微軟正黑體", 9F, FontStyle.Bold, GraphicsUnit.Point);
             Name = "Form1";
-            Text = "Form1";
+            Text = "系統管理員";
             FormClosed += Form1_FormClosed;
             tabControl.ResumeLayout(false);
             tabPage_FactoryStatus.ResumeLayout(false);

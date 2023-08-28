@@ -37,9 +37,8 @@ namespace FeildBalancing
             if (Message.Contains("Online"))
             {
                 var Device = Message.Split(',');
-                Log log = new Log("Check Device", "NOPassword");
-                log.DeviceID = Device[1];
-                switch((int)log.GetDeviceName())
+                Log log = new Log(Device[1]);
+                switch ((int)log.GetDeviceName())
                 {
                     case 0:
                         label_FeildBalancingNo1.InvokeIfRequired(() => { label_FeildBalancingNo1.Text = String.Format("平衡校正機1：上線中"); });
@@ -93,7 +92,12 @@ namespace FeildBalancing
                                     case 0 when (int)log.GetDeviceType() == (int)obj:
                                         isLoginAccessed = true;
                                         UserList.Add(log);
-                                        textBox_LogTexts.InvokeIfRequired(() => { textBox_LogTexts.Text += String.Format("[{0}] [INFO]: {1} 已登入使用 平行校正機 1\r\n", log.GetDateTime(), log.UserName); });
+                                        switch ((int)log.GetDeviceName())
+                                        {
+                                            case 0:
+                                                textBox_LogTexts.InvokeIfRequired(() => { textBox_LogTexts.Text += String.Format("[{0}] [INFO]: {1} 已登入使用 平行校正機 1\r\n", log.GetDateTime(), log.UserName); });
+                                                break;
+                                        }
                                         break;
                                 }
                             }
@@ -109,18 +113,23 @@ namespace FeildBalancing
                 {
                     server.Send(User[0], "false");
                     textBox_LogTexts.InvokeIfRequired(() => { textBox_LogTexts.Text += String.Format("[{0}] [WARN]: 有不明的使用者或嘗試使用未授權權限的機台\r\n", DateTime.Now); });
-                    label_FeildBalancingNo1.InvokeIfRequired(() => { label_FeildBalancingNo1.Text = String.Format("平衡校正機1：已離線"); });
-                    label_FeildBalancingNo1.InvokeIfRequired(() => { label_FeildBalancingNo1.ForeColor = Color.Black; });
+                    Log log = new Log(User[0]);
+                    switch ((int)log.GetDeviceName())
+                    {
+                        case 0:
+                            label_FeildBalancingNo1.InvokeIfRequired(() => { label_FeildBalancingNo1.Text = String.Format("平衡校正機1：已離線"); });
+                            label_FeildBalancingNo1.InvokeIfRequired(() => { label_FeildBalancingNo1.ForeColor = Color.Black; });
+                            break;
+                    }
                 }
             }
             if (Message.Contains("Offline"))
             {
                 var Device = Message.Split(',');
-                Log log = new Log("Check Device", "NOPassword");
-                log.DeviceID = Device[1];
+                Log log = new Log(Device[1]);
                 foreach (Log _log in UserList)
                 {
-                    switch((int)log.GetDeviceName())
+                    switch ((int)log.GetDeviceName())
                     {
                         case 0 when _log.GetDeviceName() == log.GetDeviceName():
                             textBox_LogTexts.InvokeIfRequired(() => { textBox_LogTexts.Text += String.Format("[{0}] [INFO]: {1} 已登出\r\n", log.GetDateTime(), _log.UserName); });
@@ -234,26 +243,32 @@ namespace FeildBalancing
                 int i = 0; string Info = "";
                 foreach (string staffinfo in staffInfo)
                 {
-                    if (i == 0)
-                        Info = String.Format("工作人員：{0}；", staffinfo);
-                    else if (i == 1)
-                        Info += String.Format("身分字號：{0}；", staffinfo);
-                    else if (i == 2)
-                        Info += String.Format("帳號：{0}；", staffinfo);
-                    else if (i == 3)
-                        Info += String.Format("密碼：{0}；", staffinfo);
-                    else
+                    switch (i)
                     {
-                        Info += String.Format("機台：");
-                        if (staffinfo.Contains(Machine.FieldBalancing.ToString()))
-                            Info += String.Format("Field Balancing、");
-                        if (staffinfo.Contains(Machine.etc.ToString()))
-                            Info += String.Format("etc、");
-                        else if (staffinfo.Contains(Machine.FieldBalancing.ToString()) == false && staffinfo.Contains(Machine.etc.ToString()) == false)
-                            Info += String.Format("沒有權限、");
-                        var info = Info.TrimEnd('、');
-                        listBox_StaffList.Items.Add(info);
-                        i = -1;
+                        case 0:
+                            Info = String.Format("工作人員：{0}；", staffinfo);
+                            break;
+                        case 1:
+                            Info += String.Format("身分字號：{0}；", staffinfo);
+                            break;
+                        case 2:
+                            Info += String.Format("帳號：{0}；", staffinfo);
+                            break;
+                        case 3:
+                            Info += String.Format("密碼：{0}；", staffinfo);
+                            break;
+                        case 4:
+                            Info += String.Format("機台：");
+                            if (staffinfo.Contains(Machine.FieldBalancing.ToString()))
+                                Info += String.Format("Field Balancing、");
+                            if (staffinfo.Contains(Machine.etc.ToString()))
+                                Info += String.Format("etc、");
+                            else if (!staffinfo.Contains(Machine.FieldBalancing.ToString()) && !staffinfo.Contains(Machine.etc.ToString()))
+                                Info += String.Format("沒有權限、");
+                            var info = Info.TrimEnd('、');
+                            listBox_StaffList.Items.Add(info);
+                            i = -1;
+                            break;
                     }
                     i++;
                 }
@@ -334,10 +349,15 @@ namespace FeildBalancing
             string Info = String.Format("工作人員：{0}；身分字號：{1}；帳號：{2}；密碼：{3}；機台：", Form3._Staff.Name, Form3._Staff.ID, Form3._Staff.Account, Form3._Staff.Password);
             for (int i = 0; i < Form3._Staff.AllowedMachine.Count; i++)
             {
-                if ((int)Form3._Staff.AllowedMachine[i] == 0)
-                    Info += String.Format("Field Balancing、");
-                else if ((int)Form3._Staff.AllowedMachine[i] == 1)
-                    Info += String.Format("etc、");
+                switch ((int)Form3._Staff.AllowedMachine[i])
+                {
+                    case 0:
+                        Info += String.Format("Field Balancing、");
+                        break;
+                    case 1:
+                        Info += String.Format("etc、");
+                        break;
+                }
             }
             if (Form3._Staff.AllowedMachine.Count == 0)
                 Info += String.Format("沒有權限、");
@@ -456,7 +476,7 @@ namespace FeildBalancing
             }
             catch (SocketException se)
             {
-                if(isOperating)
+                if (isOperating)
                     MessageBox.Show(se.ToString());
             }
         }

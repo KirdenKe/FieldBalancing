@@ -184,7 +184,7 @@
             Controls.Add(label1);
             Font = new Font("微軟正黑體", 9F, FontStyle.Bold, GraphicsUnit.Point);
             Name = "Form3";
-            Text = "Form3";
+            Text = "管理工作人員";
             ResumeLayout(false);
             PerformLayout();
         }

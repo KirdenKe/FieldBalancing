@@ -71,7 +71,7 @@ namespace FeildBalancing
                 allowedMachine.Add(Machine.FieldBalancing);
             if (isetcCilck)
                 allowedMachine.Add(Machine.etc);
-            if(String.IsNullOrEmpty(textBox_name.Text) || String.IsNullOrEmpty(textBox_ID.Text) || String.IsNullOrEmpty(textBox_account.Text) || String.IsNullOrEmpty(textBox_password.Text))
+            if (String.IsNullOrEmpty(textBox_name.Text) || String.IsNullOrEmpty(textBox_ID.Text) || String.IsNullOrEmpty(textBox_account.Text) || String.IsNullOrEmpty(textBox_password.Text))
             {
                 MessageBox.Show("請填寫所有欄位");
                 return;
