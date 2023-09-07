@@ -12,6 +12,15 @@ namespace FeildBalancing
         UnrecognizedDevice = -1,
         FieldBalancing
     }
+    public enum LoginStatus
+    {
+        Success,
+        AccountPasswordWrong,
+        OnlyAccountPairs,
+        PermissionDenied,
+        FailedWithName,
+        Failed
+    }
     public class Log
     {
         private string _DeviceID;
@@ -65,6 +74,23 @@ namespace FeildBalancing
         public Log(string DeviceID) 
         {
             _DeviceID = DeviceID;
+        }
+    }
+    public class Login
+    {
+        private DeviceName _deviceName;
+        public DeviceName deviceName { get => _deviceName; }
+        private int _LeftTimes;
+        public int LeftTimes { get => _LeftTimes; }
+        public LoginStatus loginStatus { get; set; }
+        public Login(DeviceName deviceName)
+        {
+            _deviceName = deviceName;
+            _LeftTimes = 2;
+        }
+        public void LoginFailed()
+        {
+            _LeftTimes -= 1;
         }
     }
     public static class Extension

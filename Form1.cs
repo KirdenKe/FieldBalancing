@@ -9,6 +9,7 @@ using Microsoft.VisualBasic.Logging;
 using System.Diagnostics;
 using System.Xml.Linq;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace FeildBalancing
 {
@@ -53,9 +54,11 @@ namespace FeildBalancing
             if (Message.Contains("Login"))
             {
                 var User = Message.Split(',');
+                Log log = new Log(User[0]);
+                LoginCheck.Add(new Login(log.GetDeviceName()));
                 string StaffInfo = "";
                 List<Staff> staff = new List<Staff>();
-                bool isLoginAccessed = false;
+                bool isNoMatch = true;
                 using (FileStream fs = new FileStream("StaffInfo.txt", FileMode.Open, FileAccess.Read))
                 {
                     using (StreamReader sr = new StreamReader(fs))
@@ -83,14 +86,16 @@ namespace FeildBalancing
                     {
                         if (User[2] == _staff.Account && User[3] == _staff.Password)
                         {
-                            Log log = new Log(_staff.Name, _staff.Password);
+                            log = new Log(_staff.Name, _staff.Password);
                             log.DeviceID = User[0];
                             foreach (object obj in _staff.AllowedMachine)
                             {
                                 switch ((int)log.GetDeviceName())
                                 {
                                     case 0 when (int)log.GetDeviceType() == (int)obj:
-                                        isLoginAccessed = true;
+                                        foreach(Login login in LoginCheck)
+                                            if (login.deviceName == log.GetDeviceName())
+                                                LoginCheck[LoginCheck.IndexOf(login)].loginStatus = LoginStatus.Success;
                                         UserList.Add(log);
                                         switch ((int)log.GetDeviceName())
                                         {
@@ -99,27 +104,81 @@ namespace FeildBalancing
                                                 break;
                                         }
                                         break;
+                                    default:
+                                        foreach (Login login in LoginCheck)
+                                            if (login.deviceName == log.GetDeviceName())
+                                                LoginCheck[LoginCheck.IndexOf(login)].loginStatus = LoginStatus.PermissionDenied;
+                                        break;
                                 }
                             }
+                            isNoMatch = false;
+                            break;
+                        }
+                        else if(User[2] == _staff.Account)
+                        {
+                            log = new Log(_staff.Name, _staff.Password);
+                            log.DeviceID = User[0];
+                            foreach (Login login in LoginCheck)
+                                if (login.deviceName == log.GetDeviceName())
+                                {
+                                    LoginCheck[LoginCheck.IndexOf(login)].loginStatus = LoginStatus.OnlyAccountPairs;
+                                    LoginCheck[LoginCheck.IndexOf(login)].LoginFailed();
+                                    if(LoginCheck[LoginCheck.IndexOf(login)].LeftTimes == -1)
+                                        LoginCheck[LoginCheck.IndexOf(login)].loginStatus = LoginStatus.FailedWithName;
+                                }
+                            isNoMatch = false;
+                            break;
                         }
                     }
-                }
-                if (isLoginAccessed)
-                {
-                    isLoginAccessed = false;
-                    server.Send(User[0], "true");
-                }
-                else
-                {
-                    server.Send(User[0], "false");
-                    textBox_LogTexts.InvokeIfRequired(() => { textBox_LogTexts.Text += String.Format("[{0}] [WARN]: 有不明的使用者或嘗試使用未授權權限的機台\r\n", DateTime.Now); });
-                    Log log = new Log(User[0]);
-                    switch ((int)log.GetDeviceName())
+                    if(isNoMatch)
                     {
-                        case 0:
-                            label_FeildBalancingNo1.InvokeIfRequired(() => { label_FeildBalancingNo1.Text = String.Format("平衡校正機1：已離線"); });
-                            label_FeildBalancingNo1.InvokeIfRequired(() => { label_FeildBalancingNo1.ForeColor = Color.Black; });
-                            break;
+                        foreach (Login login in LoginCheck)
+                            if (login.deviceName == log.GetDeviceName())
+                            {
+                                LoginCheck[LoginCheck.IndexOf(login)].loginStatus = LoginStatus.AccountPasswordWrong;
+                                LoginCheck[LoginCheck.IndexOf(login)].LoginFailed();
+                                if (LoginCheck[LoginCheck.IndexOf(login)].LeftTimes == -1)
+                                    LoginCheck[LoginCheck.IndexOf(login)].loginStatus = LoginStatus.Failed;
+                            }
+                    }
+                }
+                foreach(Login login in LoginCheck)
+                {
+                    if (login.deviceName == log.GetDeviceName())
+                    {
+                        switch((int)login.loginStatus)
+                        {
+                            case 0:
+                                server.Send(User[0], "true");
+                                LoginCheck.RemoveAt(LoginCheck.IndexOf(login));
+                                break;
+                            case 1:
+                                server.Send(User[0], login.LeftTimes.ToString());
+                                textBox_LogTexts.InvokeIfRequired(() => { textBox_LogTexts.Text += String.Format("[{0}] [WARN]: 不明使用者嘗試登入 {1} 失敗\r\n", DateTime.Now, log.GetDeviceChName()); });
+                                break;
+                            case 2:
+                                server.Send(User[0], login.LeftTimes.ToString());
+                                textBox_LogTexts.InvokeIfRequired(() => { textBox_LogTexts.Text += String.Format("[{0}] [WARN]: 使用者 {1} 嘗試登入失敗\r\n", DateTime.Now, log.UserName); });
+                                break;
+                            case 3:
+                                server.Send(User[0], "false");
+                                textBox_LogTexts.InvokeIfRequired(() => { textBox_LogTexts.Text += String.Format("[{0}] [ERROR]: 使用者 {1} 嘗試使用未經授權權限的機台 {2}\r\n", DateTime.Now, log.UserName, log.GetDeviceChName()); });
+                                CloseConnection(log.GetDeviceName());
+                                LoginCheck.RemoveAt(LoginCheck.IndexOf(login));
+                                break;
+                            case 4:
+                                server.Send(User[0], "false");
+                                textBox_LogTexts.InvokeIfRequired(() => { textBox_LogTexts.Text += String.Format("[{0}] [ERROR]: 使用者 {1} 的帳號密碼可能遭到盜用\r\n", DateTime.Now, log.UserName); });
+                                CloseConnection(log.GetDeviceName());
+                                LoginCheck.RemoveAt(LoginCheck.IndexOf(login));
+                                break;
+                            case 5:
+                                server.Send(User[0], "false");
+                                textBox_LogTexts.InvokeIfRequired(() => { textBox_LogTexts.Text += String.Format("[{0}] [ERROR]: 不明使用者嘗試登入機台 {1}\r\n", DateTime.Now, log.GetDeviceChName()); });
+                                CloseConnection(log.GetDeviceName());
+                                LoginCheck.RemoveAt(LoginCheck.IndexOf(login));
+                                break;
+                        }
                     }
                 }
             }
@@ -155,6 +214,16 @@ namespace FeildBalancing
                         textBox_LogTexts.InvokeIfRequired(() => { textBox_LogTexts.Text += String.Format("[{0}] [INFO]: {1} 於 {2} 中{3}\r\n", log.GetDateTime(), log.UserName, log.GetDeviceChName(), aesDecryptBase64(Log[2], log.UserPassword)); });
                     }
                 }
+            }
+        }
+        private void CloseConnection(DeviceName deviceName)
+        {
+            switch ((int)deviceName)
+            {
+                case 0:
+                    label_FeildBalancingNo1.InvokeIfRequired(() => { label_FeildBalancingNo1.Text = String.Format("平衡校正機1：已離線"); });
+                    label_FeildBalancingNo1.InvokeIfRequired(() => { label_FeildBalancingNo1.ForeColor = Color.Black; });
+                    break;
             }
         }
         private void AllowedUseForm(object sender, LoginArgs e)
@@ -522,7 +591,7 @@ namespace FeildBalancing
                 }
                 catch
                 {
-                    break;
+                    continue;
                 }
             }
         }

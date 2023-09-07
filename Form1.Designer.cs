@@ -13,6 +13,7 @@ namespace FeildBalancing
         string Account;
         string Password;
         List<Log> UserList = new List<Log>();
+        List<Login> LoginCheck = new List<Login>();
 
         /// <summary>
         ///  Clean up any resources being used.
