@@ -10,6 +10,8 @@ using System.Diagnostics;
 using System.Xml.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Security.Claims;
+using System.Windows.Forms;
 
 namespace FeildBalancing
 {
@@ -55,7 +57,17 @@ namespace FeildBalancing
             {
                 var User = Message.Split(',');
                 Log log = new Log(User[0]);
-                LoginCheck.Add(new Login(log.GetDeviceName()));
+                if (LoginCheck.Count == 0)
+                    LoginCheck.Add(new Login(log.GetDeviceName()));
+                else
+                {
+                    bool isDuplicate = false;
+                    foreach (Login login in LoginCheck)
+                        if (login.deviceName == log.GetDeviceName())
+                            isDuplicate = true;
+                    if (!isDuplicate)
+                        LoginCheck.Add(new Login(log.GetDeviceName()));
+                }
                 string StaffInfo = "";
                 List<Staff> staff = new List<Staff>();
                 bool isNoMatch = true;
@@ -88,12 +100,18 @@ namespace FeildBalancing
                         {
                             log = new Log(_staff.Name, _staff.Password);
                             log.DeviceID = User[0];
+                            if (_staff.AllowedMachine.Count == 0)
+                            {
+                                foreach (Login login in LoginCheck)
+                                    if (login.deviceName == log.GetDeviceName())
+                                        LoginCheck[LoginCheck.IndexOf(login)].loginStatus = LoginStatus.PermissionDenied;
+                            }
                             foreach (object obj in _staff.AllowedMachine)
                             {
                                 switch ((int)log.GetDeviceName())
                                 {
                                     case 0 when (int)log.GetDeviceType() == (int)obj:
-                                        foreach(Login login in LoginCheck)
+                                        foreach (Login login in LoginCheck)
                                             if (login.deviceName == log.GetDeviceName())
                                                 LoginCheck[LoginCheck.IndexOf(login)].loginStatus = LoginStatus.Success;
                                         UserList.Add(log);
@@ -114,7 +132,7 @@ namespace FeildBalancing
                             isNoMatch = false;
                             break;
                         }
-                        else if(User[2] == _staff.Account)
+                        else if (User[2] == _staff.Account)
                         {
                             log = new Log(_staff.Name, _staff.Password);
                             log.DeviceID = User[0];
@@ -123,30 +141,30 @@ namespace FeildBalancing
                                 {
                                     LoginCheck[LoginCheck.IndexOf(login)].loginStatus = LoginStatus.OnlyAccountPairs;
                                     LoginCheck[LoginCheck.IndexOf(login)].LoginFailed();
-                                    if(LoginCheck[LoginCheck.IndexOf(login)].LeftTimes == -1)
+                                    if (LoginCheck[LoginCheck.IndexOf(login)].LeftTimes <= -1)
                                         LoginCheck[LoginCheck.IndexOf(login)].loginStatus = LoginStatus.FailedWithName;
                                 }
                             isNoMatch = false;
                             break;
                         }
                     }
-                    if(isNoMatch)
+                    if (isNoMatch)
                     {
                         foreach (Login login in LoginCheck)
                             if (login.deviceName == log.GetDeviceName())
                             {
                                 LoginCheck[LoginCheck.IndexOf(login)].loginStatus = LoginStatus.AccountPasswordWrong;
                                 LoginCheck[LoginCheck.IndexOf(login)].LoginFailed();
-                                if (LoginCheck[LoginCheck.IndexOf(login)].LeftTimes == -1)
+                                if (LoginCheck[LoginCheck.IndexOf(login)].LeftTimes <= -1)
                                     LoginCheck[LoginCheck.IndexOf(login)].loginStatus = LoginStatus.Failed;
                             }
                     }
                 }
-                foreach(Login login in LoginCheck)
+                foreach (Login login in LoginCheck)
                 {
                     if (login.deviceName == log.GetDeviceName())
                     {
-                        switch((int)login.loginStatus)
+                        switch ((int)login.loginStatus)
                         {
                             case 0:
                                 server.Send(User[0], "true");
@@ -165,18 +183,24 @@ namespace FeildBalancing
                                 textBox_LogTexts.InvokeIfRequired(() => { textBox_LogTexts.Text += String.Format("[{0}] [ERROR]: 使用者 {1} 嘗試使用未經授權權限的機台 {2}\r\n", DateTime.Now, log.UserName, log.GetDeviceChName()); });
                                 CloseConnection(log.GetDeviceName());
                                 LoginCheck.RemoveAt(LoginCheck.IndexOf(login));
+                                alarm = new Thread(() => { MessageBox.Show(String.Format("[{0}] [ERROR]: 使用者 {1} 嘗試使用未經授權權限的機台 {2}\r\n", DateTime.Now, log.UserName, log.GetDeviceChName()), "重大資安警告", MessageBoxButtons.OK, MessageBoxIcon.Error); });
+                                alarm.Start();
                                 break;
                             case 4:
                                 server.Send(User[0], "false");
                                 textBox_LogTexts.InvokeIfRequired(() => { textBox_LogTexts.Text += String.Format("[{0}] [ERROR]: 使用者 {1} 的帳號密碼可能遭到盜用\r\n", DateTime.Now, log.UserName); });
                                 CloseConnection(log.GetDeviceName());
                                 LoginCheck.RemoveAt(LoginCheck.IndexOf(login));
+                                alarm = new Thread(() => { MessageBox.Show(String.Format("[{0}] [ERROR]: 使用者 {1} 的帳號密碼可能遭到盜用\r\n", DateTime.Now, log.UserName), "重大資安警告", MessageBoxButtons.OK, MessageBoxIcon.Error); });
+                                alarm.Start();
                                 break;
                             case 5:
                                 server.Send(User[0], "false");
                                 textBox_LogTexts.InvokeIfRequired(() => { textBox_LogTexts.Text += String.Format("[{0}] [ERROR]: 不明使用者嘗試登入機台 {1}\r\n", DateTime.Now, log.GetDeviceChName()); });
                                 CloseConnection(log.GetDeviceName());
                                 LoginCheck.RemoveAt(LoginCheck.IndexOf(login));
+                                alarm = new Thread(() => { MessageBox.Show(String.Format("[{0}] [ERROR]: 不明使用者嘗試登入機台 {1}\r\n", DateTime.Now, log.GetDeviceChName()), "重大資安警告", MessageBoxButtons.OK, MessageBoxIcon.Error); });
+                                alarm.Start();
                                 break;
                         }
                     }
@@ -478,6 +502,27 @@ namespace FeildBalancing
                 }
             }
         }
+
+        private void button_locker_Click(object sender, EventArgs e)
+        {
+            tabControl.Visible = false;
+            tabControl.Enabled = false;
+            var LoginForm = new Form2(true);
+            LoginForm.LoginHandler += UnlockForm;
+            LoginForm.ShowDialog();
+        }
+        private void UnlockForm(object sender, LoginArgs e)
+        {
+            if (e.isLoginSuccessed)
+            {
+                tabControl.Visible = true;
+                tabControl.Enabled = true;
+                Account = e.account;
+                Password = e.password;
+            }
+            else
+                textBox_LogTexts.Text += String.Format("[{0}] [ERROR]: 不明使用者嘗試登入核心終端裝置\r\n", DateTime.Now);
+        }
     }
 
     //設定封包格式。不一定要用struct，這邊選它只是為了讓資料結構更好看
@@ -597,14 +642,17 @@ namespace FeildBalancing
         }
         public void Send(string DeviceID, string message)
         {
-            server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            var IP = Dns.GetHostEntry(DeviceID);
-            foreach (IPAddress iP in IP.AddressList)
+            if (!server.Connected)
             {
-                if (iP.ToString().Contains("192.168") && iP.ToString().Contains("192.168.137") == false)
+                server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                var IP = Dns.GetHostEntry(DeviceID);
+                foreach (IPAddress iP in IP.AddressList)
                 {
-                    server.Connect(iP, 8080);
-                    break;
+                    if (iP.ToString().Contains("192.168") && iP.ToString().Contains("192.168.137") == false)
+                    {
+                        server.Connect(iP, 8080);
+                        break;
+                    }
                 }
             }
             //只有連線成功才開始傳遞資料

@@ -7,6 +7,7 @@
         /// </summary>
         private System.ComponentModel.IContainer components = null;
         public event EventHandler<LoginArgs> LoginHandler = delegate { };
+        bool isLoginOnce = false;
 
         /// <summary>
         /// Clean up any resources being used.

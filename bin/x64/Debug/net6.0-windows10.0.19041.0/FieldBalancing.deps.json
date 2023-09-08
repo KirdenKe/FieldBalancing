@@ -6,12 +6,12 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "FeildBalancing/1.0.0": {
+      "FieldBalancing/1.0.1": {
         "dependencies": {
           "runtimepack.Microsoft.Windows.SDK.NET.Ref": "10.0.19041.28"
         },
         "runtime": {
-          "FeildBalancing.dll": {}
+          "FieldBalancing.dll": {}
         }
       },
       "runtimepack.Microsoft.Windows.SDK.NET.Ref/10.0.19041.28": {
@@ -29,7 +29,7 @@
     }
   },
   "libraries": {
-    "FeildBalancing/1.0.0": {
+    "FieldBalancing/1.0.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

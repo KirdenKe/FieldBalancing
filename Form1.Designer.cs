@@ -14,6 +14,7 @@ namespace FeildBalancing
         string Password;
         List<Log> UserList = new List<Log>();
         List<Login> LoginCheck = new List<Login>();
+        Thread alarm;
 
         /// <summary>
         ///  Clean up any resources being used.
@@ -55,6 +56,8 @@ namespace FeildBalancing
             tabPage_QueryLogFile = new TabPage();
             textBox_LogFile = new TextBox();
             button_SelectFile = new Button();
+            tabPage_Locker = new TabPage();
+            button_locker = new Button();
             tabControl.SuspendLayout();
             tabPage_FactoryStatus.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox_FeildBalancingNo3).BeginInit();
@@ -62,6 +65,7 @@ namespace FeildBalancing
             ((System.ComponentModel.ISupportInitialize)pictureBox_FeildBalancingNo1).BeginInit();
             tabPage_StaffManagement.SuspendLayout();
             tabPage_QueryLogFile.SuspendLayout();
+            tabPage_Locker.SuspendLayout();
             SuspendLayout();
             // 
             // tabControl
@@ -69,6 +73,7 @@ namespace FeildBalancing
             tabControl.Controls.Add(tabPage_FactoryStatus);
             tabControl.Controls.Add(tabPage_StaffManagement);
             tabControl.Controls.Add(tabPage_QueryLogFile);
+            tabControl.Controls.Add(tabPage_Locker);
             tabControl.Enabled = false;
             tabControl.Location = new Point(12, 12);
             tabControl.Name = "tabControl";
@@ -266,6 +271,28 @@ namespace FeildBalancing
             button_SelectFile.UseVisualStyleBackColor = true;
             button_SelectFile.Click += button_SelectFile_Click;
             // 
+            // tabPage_Locker
+            // 
+            tabPage_Locker.BackColor = SystemColors.Control;
+            tabPage_Locker.Controls.Add(button_locker);
+            tabPage_Locker.Location = new Point(4, 28);
+            tabPage_Locker.Name = "tabPage_Locker";
+            tabPage_Locker.Size = new Size(768, 394);
+            tabPage_Locker.TabIndex = 3;
+            tabPage_Locker.Text = "資訊防護";
+            // 
+            // button_locker
+            // 
+            button_locker.BackgroundImage = Properties.Resources._lock;
+            button_locker.BackgroundImageLayout = ImageLayout.Zoom;
+            button_locker.Location = new Point(177, 79);
+            button_locker.Name = "button_locker";
+            button_locker.Size = new Size(402, 227);
+            button_locker.TabIndex = 0;
+            button_locker.Text = " ";
+            button_locker.UseVisualStyleBackColor = true;
+            button_locker.Click += button_locker_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
@@ -286,6 +313,7 @@ namespace FeildBalancing
             tabPage_StaffManagement.PerformLayout();
             tabPage_QueryLogFile.ResumeLayout(false);
             tabPage_QueryLogFile.PerformLayout();
+            tabPage_Locker.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -310,5 +338,7 @@ namespace FeildBalancing
         private TabPage tabPage_QueryLogFile;
         private TextBox textBox_LogFile;
         private Button button_SelectFile;
+        private TabPage tabPage_Locker;
+        private Button button_locker;
     }
 }
