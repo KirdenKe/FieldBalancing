@@ -20,7 +20,7 @@ namespace FeildBalancing
         public Form1()
         {
             InitializeComponent();
-            var LoginForm = new Form2();
+            LoginForm = new Form2();
             LoginForm.LoginHandler += AllowedUseForm;
             LoginForm.ShowDialog();
             Form3._Staff = new Staff();
@@ -507,8 +507,9 @@ namespace FeildBalancing
         {
             tabControl.Visible = false;
             tabControl.Enabled = false;
-            var LoginForm = new Form2(true);
+            LoginForm = new Form2(true);
             LoginForm.LoginHandler += UnlockForm;
+            LoginForm.LockHandler += Restartform;
             LoginForm.ShowDialog();
         }
         private void UnlockForm(object sender, LoginArgs e)
@@ -522,6 +523,11 @@ namespace FeildBalancing
             }
             else
                 textBox_LogTexts.Text += String.Format("[{0}] [ERROR]: 不明使用者嘗試登入核心終端裝置\r\n", DateTime.Now);
+        }
+        private void Restartform(object sender, LockArgs e)
+        {
+            LoginForm.TruelyClosed();
+            button_locker_Click(this, null);
         }
     }
 

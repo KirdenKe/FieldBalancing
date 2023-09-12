@@ -20,13 +20,14 @@ namespace FeildBalancing
         public Form2(bool LoginOnceCheck)
         {
             InitializeComponent();
+            administrator = new Administrator();
             isLoginOnce = LoginOnceCheck;
         }
 
         private void button_login_Click(object sender, EventArgs e)
         {
-            var administrator = new Administrator(textBox_account.Text, textBox_password.Text);
-            if(!isLoginOnce)
+            administrator = new Administrator(textBox_account.Text, textBox_password.Text);
+            if (!isLoginOnce)
             {
                 if (administrator.AllowLogin)
                 {
@@ -38,7 +39,7 @@ namespace FeildBalancing
                         localLoginHandler?.Invoke(this, ar);
                     }
                 }
-            else
+                else
                     MessageBox.Show("登入失敗！");
             }
             else
@@ -52,10 +53,28 @@ namespace FeildBalancing
                 if (!administrator.AllowLogin)
                     MessageBox.Show("登入失敗！");
             }
-            if(!isLoginOnce)
+            if (!isLoginOnce)
                 Close();
-            if(isLoginOnce && administrator.AllowLogin)
+            if (isLoginOnce && administrator.AllowLogin)
                 Close();
+        }
+
+        private void Form2_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (isLoginOnce && !administrator.AllowLogin)
+            {
+                if (LockHandler != null)
+                {
+                    var localLockHandler = new EventHandler<LockArgs>(LockHandler);
+                    var ar = new LockArgs();
+                    localLockHandler?.Invoke(this, ar);
+                }
+            }
+        }
+        public void TruelyClosed()
+        {
+            isLoginOnce = false;
+            Close();
         }
     }
 }

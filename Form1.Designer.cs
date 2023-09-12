@@ -14,6 +14,7 @@ namespace FeildBalancing
         string Password;
         List<Log> UserList = new List<Log>();
         List<Login> LoginCheck = new List<Login>();
+        Form2 LoginForm;
         Thread alarm;
 
         /// <summary>

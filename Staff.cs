@@ -48,6 +48,10 @@ namespace FeildBalancing
             if (encrypt == _VerifyKey)
                 _AllowLogin = true;
         }
+        public Administrator()
+        {
+            _AllowLogin = false;
+        }
         internal static string aesEncryptBase64(string account, string password)
         {
             string encrypt = "";
@@ -103,5 +107,9 @@ namespace FeildBalancing
                 _password = password;
             }
         }
+    }
+    public class LockArgs : EventArgs
+    {
+
     }
 }

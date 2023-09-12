@@ -6,7 +6,9 @@
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
+        private static Administrator administrator;
         public event EventHandler<LoginArgs> LoginHandler = delegate { };
+        public event EventHandler<LockArgs> LockHandler = delegate { };
         bool isLoginOnce = false;
 
         /// <summary>
@@ -92,6 +94,7 @@
             Font = new Font("微軟正黑體", 9F, FontStyle.Bold, GraphicsUnit.Point);
             Name = "Form2";
             Text = "請先登入";
+            FormClosed += Form2_FormClosed;
             ResumeLayout(false);
             PerformLayout();
         }
