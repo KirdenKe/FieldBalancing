@@ -11,13 +11,13 @@ using System.Windows.Forms;
 
 namespace FeildBalancing
 {
-    public partial class Form2 : Form
+    public partial class LoginForm : Form
     {
-        public Form2()
+        public LoginForm()
         {
             InitializeComponent();
         }
-        public Form2(bool LoginOnceCheck)
+        public LoginForm(bool LoginOnceCheck)
         {
             InitializeComponent();
             administrator = new Administrator();

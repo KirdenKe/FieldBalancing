@@ -10,13 +10,13 @@ using System.Windows.Forms;
 
 namespace FeildBalancing
 {
-    public partial class Form3 : Form
+    public partial class StaffForm : Form
     {
-        public Form3()
+        public StaffForm()
         {
             InitializeComponent();
         }
-        public Form3(string name, string iD, string account, string password, string allowedMachine)
+        public StaffForm(string name, string iD, string account, string password, string allowedMachine)
         {
             InitializeComponent();
             textBox_name.Text = name;

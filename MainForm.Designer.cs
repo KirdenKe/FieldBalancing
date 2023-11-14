@@ -3,7 +3,7 @@ using Windows.Devices.WiFiDirect;
 
 namespace FeildBalancing
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         ///  Required designer variable.
@@ -14,7 +14,7 @@ namespace FeildBalancing
         string Password;
         List<Log> UserList = new List<Log>();
         List<Login> LoginCheck = new List<Login>();
-        Form2 LoginForm;
+        LoginForm LoginForm;
         Thread alarm;
 
         /// <summary>

@@ -15,15 +15,15 @@ using System.Windows.Forms;
 
 namespace FeildBalancing
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
-            LoginForm = new Form2();
+            LoginForm = new LoginForm();
             LoginForm.LoginHandler += AllowedUseForm;
             LoginForm.ShowDialog();
-            Form3._Staff = new Staff();
+            StaffForm._Staff = new Staff();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -106,8 +106,11 @@ namespace FeildBalancing
                                     if (login.deviceName == log.GetDeviceName())
                                         LoginCheck[LoginCheck.IndexOf(login)].loginStatus = LoginStatus.PermissionDenied;
                             }
+                            bool isLoginSuccess = false;
                             foreach (object obj in _staff.AllowedMachine)
                             {
+                                if (isLoginSuccess)
+                                    break;
                                 switch ((int)log.GetDeviceName())
                                 {
                                     case 0 when (int)log.GetDeviceType() == (int)obj:
@@ -265,15 +268,15 @@ namespace FeildBalancing
 
         private void button_NewStaff_Click(object sender, EventArgs e)
         {
-            var AddStaffForm = new Form3();
+            var AddStaffForm = new StaffForm();
             AddStaffForm.ShowDialog();
             if (Administrator.aesEncryptBase64(Account, Password) == Administrator.VerifyKey)
             {
-                if (Form3._Staff.isComplete)
+                if (StaffForm._Staff.isComplete)
                 {
                     listBox_StaffList.Items.Add(WriteListBox());
                     WriteFile();
-                    Form3._Staff.isComplete = false;
+                    StaffForm._Staff.isComplete = false;
                 }
             }
         }
@@ -422,15 +425,15 @@ namespace FeildBalancing
                 {
                     info += infoArray[j].Replace(" ", "");
                 }
-                var EditStaffForm = new Form3(infoArray[1], infoArray[3], infoArray[5], infoArray[7], info);
+                var EditStaffForm = new StaffForm(infoArray[1], infoArray[3], infoArray[5], infoArray[7], info);
                 EditStaffForm.ShowDialog();
                 if (Administrator.aesEncryptBase64(Account, Password) == Administrator.VerifyKey)
                 {
-                    if (Form3._Staff.isComplete)
+                    if (StaffForm._Staff.isComplete)
                     {
                         listBox_StaffList.Items[listBox_StaffList.SelectedIndex] = WriteListBox();
                         WriteFile();
-                        Form3._Staff.isComplete = false;
+                        StaffForm._Staff.isComplete = false;
                     }
                 }
             }
@@ -439,10 +442,10 @@ namespace FeildBalancing
         }
         private string WriteListBox()
         {
-            string Info = String.Format("工作人員：{0}；身分字號：{1}；帳號：{2}；密碼：{3}；機台：", Form3._Staff.Name, Form3._Staff.ID, Form3._Staff.Account, Form3._Staff.Password);
-            for (int i = 0; i < Form3._Staff.AllowedMachine.Count; i++)
+            string Info = String.Format("工作人員：{0}；身分字號：{1}；帳號：{2}；密碼：{3}；機台：", StaffForm._Staff.Name, StaffForm._Staff.ID, StaffForm._Staff.Account, StaffForm._Staff.Password);
+            for (int i = 0; i < StaffForm._Staff.AllowedMachine.Count; i++)
             {
-                switch ((int)Form3._Staff.AllowedMachine[i])
+                switch ((int)StaffForm._Staff.AllowedMachine[i])
                 {
                     case 0:
                         Info += String.Format("Field Balancing、");
@@ -452,7 +455,7 @@ namespace FeildBalancing
                         break;
                 }
             }
-            if (Form3._Staff.AllowedMachine.Count == 0)
+            if (StaffForm._Staff.AllowedMachine.Count == 0)
                 Info += String.Format("沒有權限、");
             Info = Info.TrimEnd('、');
             return Info;
@@ -507,7 +510,7 @@ namespace FeildBalancing
         {
             tabControl.Visible = false;
             tabControl.Enabled = false;
-            LoginForm = new Form2(true);
+            LoginForm = new LoginForm(true);
             LoginForm.LoginHandler += UnlockForm;
             LoginForm.LockHandler += Restartform;
             LoginForm.ShowDialog();

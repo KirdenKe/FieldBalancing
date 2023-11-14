@@ -1,6 +1,6 @@
 ﻿namespace FeildBalancing
 {
-    partial class Form3
+    partial class StaffForm
     {
         /// <summary>
         /// Required designer variable.
