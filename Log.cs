@@ -37,6 +37,9 @@ namespace FeildBalancing
             {
                 case "DESKTOP-LP0UGI9":
                     return DeviceName.FieldBalancing1;
+                /*本機測試*/
+                //case "LAPTOP-L53CFE5A":
+                //    return DeviceName.FieldBalancing1;
                 default:
                     return DeviceName.Unrecognized_Device;
             }
@@ -47,6 +50,9 @@ namespace FeildBalancing
             {
                 case "DESKTOP-LP0UGI9":
                     return "平衡校正機 1";
+                /*本機測試*/
+                //case "LAPTOP-L53CFE5A":
+                //    return "本機測試";
                 default:
                     return "Unrecognized Device";
             }
@@ -57,6 +63,9 @@ namespace FeildBalancing
             {
                 case "DESKTOP-LP0UGI9":
                     return DeviceType.FieldBalancing;
+                /*本機測試*/
+                //case "LAPTOP-L53CFE5A":
+                //    return DeviceType.FieldBalancing;
                 default:
                     return DeviceType.UnrecognizedDevice;
             }

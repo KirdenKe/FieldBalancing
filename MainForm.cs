@@ -122,6 +122,7 @@ namespace FeildBalancing
                                         {
                                             case 0:
                                                 textBox_LogTexts.InvokeIfRequired(() => { textBox_LogTexts.Text += String.Format("[{0}] [INFO]: {1} 已登入使用 平行校正機 1\r\n", log.GetDateTime(), log.UserName); });
+                                                isLoginSuccess = true;
                                                 break;
                                         }
                                         break;
@@ -263,6 +264,7 @@ namespace FeildBalancing
                 Password = e.password;
                 server = new Server(8080, 1);
                 server.Receive += ReceiveMessage;
+                isOpenServer = true;
             }
         }
 
@@ -480,7 +482,8 @@ namespace FeildBalancing
             }
             try
             {
-                server.Receive -= ReceiveMessage;
+                if(isOpenServer)
+                    server.Receive -= ReceiveMessage;
             }
             catch { }
             if (server != null)
